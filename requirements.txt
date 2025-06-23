@@ -1,0 +1,6 @@
+openai==0.28.0
+gitingest==0.1.4
+docker==7.1.0
+tqdm==4.67.1
+beautifulsoup4==4.13.4
+python-dotenv==1.1.0
